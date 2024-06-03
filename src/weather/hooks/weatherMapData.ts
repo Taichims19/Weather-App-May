@@ -1,4 +1,4 @@
-import axios, { AxiosError} from 'axios';
+import axios, { AxiosError } from "axios";
 import {
   BASE_URL,
   API_KEY,
@@ -6,13 +6,10 @@ import {
   WEATHERBIT_BASE_URL,
   WEATHERBIT_API_KEY,
   WEATHERBIT_FORECAST_URL,
-} from './constCallsApi';
+} from "./constCallsApi";
 
 // Variable para controlar si debemos evitar hacer llamadas a la API después de errores
 let apiCallBlockedUntil = 0;
-
-
-
 
 // Definimos la función para manejar errores de la API
 const handleApiError = (error: unknown) => {
@@ -25,7 +22,7 @@ const handleApiError = (error: unknown) => {
       // Bloquear nuevas llamadas API durante 10 minutos después de recibir error 429
       apiCallBlockedUntil = Date.now() + 10 * 60 * 1000;
       console.error(
-        'Hemos excedido el límite de solicitudes al API de WeatherBit'
+        "Hemos excedido el límite de solicitudes al API de WeatherBit"
       );
     }
   } else if (err.message) {
@@ -39,12 +36,12 @@ const handleApiError = (error: unknown) => {
 // Función para verificar si las llamadas API están bloqueadas
 const checkApiCallBlock = () => {
   if (Date.now() < apiCallBlockedUntil) {
-    throw new Error('API call temporarily blocked due to frequent requests.');
+    throw new Error("API call temporarily blocked due to frequent requests.");
   }
 };
 
 // Datos meteorológicos de OpenWeatherMap
-export const weatherMapData = async (city:string) => {
+export const weatherMapData = async (city: string): Promise<any> => {
   checkApiCallBlock();
   const cacheKey = `weather-${city}`;
   const cached = localStorage.getItem(cacheKey);
@@ -69,7 +66,10 @@ export const weatherMapData = async (city:string) => {
 };
 
 // Pronóstico horario de OpenWeatherMap
-export const weatherHourlyForecast = async (lat: any, lon: any) => {
+export const weatherHourlyForecast = async (
+  lat: number,
+  lon: number
+): Promise<any> => {
   checkApiCallBlock();
   try {
     const { data } = await axios.get(
@@ -82,7 +82,10 @@ export const weatherHourlyForecast = async (lat: any, lon: any) => {
 };
 
 // Datos de WeatherBit para precipitaciones y UV
-export const getWeatherBitData = async (lat: any, lon: any) => {
+export const getWeatherBitData = async (
+  lat: number,
+  lon: number
+): Promise<any> => {
   checkApiCallBlock();
   const cacheKey = `weatherbit-${lat}-${lon}`;
   const cached = localStorage.getItem(cacheKey);
@@ -112,7 +115,7 @@ export const getWeatherBitData = async (lat: any, lon: any) => {
 };
 
 // Pronóstico diario de OpenWeatherMap para 7 días
-export const weatherDailyForecast = async (city: string) => {
+export const weatherDailyForecast = async (city: string): Promise<any> => {
   checkApiCallBlock();
   try {
     const response = await axios.get(

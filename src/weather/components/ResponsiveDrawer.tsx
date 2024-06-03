@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchWeatherData } from "../../store/weather/fetchWeatherData";
+import { fetchWeatherData } from "../../store/weather/thunksWeatherData";
 
 import {
   Box,
@@ -17,7 +17,13 @@ import AirIcon from "@mui/icons-material/Air";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import useGeolocationAndCity from "../hooks/useGeolocation";
-import { AppDispatch, RootState } from "../../store";
+import { RootState } from "../../store";
+import { setTodayChange } from "../../store/weather/weatherSlice";
+import {
+  getWeatherBitData,
+  weatherHourlyForecast,
+  weatherMapData,
+} from "../hooks/weatherMapData";
 
 export const ResponsiveDrawer = ({
   onCityChange,
@@ -28,10 +34,15 @@ export const ResponsiveDrawer = ({
     localStorage.getItem("city") ?? ""
   );
   const [localCity, setLocalCity] = React.useState("");
-  const dispatch: AppDispatch = useDispatch();
-  const { todayWheather, loading } = useSelector(
-    (state: RootState) => state.weather
-  );
+  const dispatch = useDispatch();
+  const {
+    todayWheather,
+    weatherBitData,
+    hourlyData,
+    hourlyForecast,
+    data,
+    loading,
+  } = useSelector((state: RootState) => state.weather);
 
   // Utilizamos el hook de geolocalización
   const { refreshLocation } = useGeolocationAndCity();
@@ -39,9 +50,31 @@ export const ResponsiveDrawer = ({
   // Efecto para disparar la búsqueda inicial o cuando cambia la ciudad en la geolocalización
   useEffect(() => {
     if (localCity) {
-      dispatch(fetchWeatherData(localCity)); // Cambiamos city por localCity
+      //dispatch(fetchWeatherData(localCity)); // Cambiamos city por localCity
+      fetchData(localCity);
+      onCityChange(localCity);
     }
   }, [localCity, dispatch]);
+
+  const fetchData = async (city: string) => {
+    const data = await weatherMapData(city);
+    const hourlyData = await weatherHourlyForecast(
+      data.coord.lat,
+      data.coord.lon
+    );
+    const weatherBitData = await getWeatherBitData(
+      data.coord.lat,
+      data.coord.lon
+    );
+
+    dispatch(setToday({ data, hourlyData, weatherBitData }));
+    console.log(
+      "data, hourlyData, weatherBitData",
+      data,
+      hourlyData,
+      weatherBitData
+    );
+  };
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +86,7 @@ export const ResponsiveDrawer = ({
     // Limpiamos el input después de la búsqueda
     setInputCity("");
     // Llamar al dispatch para obtener los datos del clima
-    dispatch(fetchWeatherData(inputCity));
+    //dispatch(fetchWeatherData(inputCity));
   };
 
   const handleRefreshLocation = () => {
@@ -122,12 +155,11 @@ export const ResponsiveDrawer = ({
           <CircularProgress />
         </Box>
       )}
-
-      {/* {!loading && todayWheather && (
+      {!loading && weatherBitData && (
         <>
           <Typography sx={{ marginLeft: "5%", marginTop: "4%" }} variant="h4">
             <strong>
-              {todayWheather.name} | {weatherData.sys.country}
+              {/* {weatherData.name} | {weatherData.sys.country} */}
             </strong>
           </Typography>
           <div>
@@ -171,51 +203,53 @@ export const ResponsiveDrawer = ({
             </Typography>
             <Grid container spacing={2} sx={{ padding: 2, paddingBottom: 8 }}>
               {hourlyForecast &&
-                hourlyForecast.list.slice(0, 6).map((forecast, index) => (
-                  <Grid
-                    item
-                    xs={2}
-                    key={index}
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Typography
-                      variant="caption"
+                hourlyForecast.list
+                  .slice(0, 6)
+                  .map((forecast: any, index: any) => (
+                    <Grid
+                      item
+                      xs={2}
+                      key={index}
                       sx={{
-                        textAlign: "center",
-                        padding: 1,
-                        fontSize: "14px",
-                        color: "rgba(0, 0, 0, 0.4)",
-                        fontWeight: "700",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
                       }}
                     >
-                      {new Date(forecast.dt * 1000).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </Typography>
-                    <img
-                      src={`http://openweathermap.org/img/wn/${forecast.weather[0].icon}.png`}
-                      alt={forecast.weather[0].main}
-                      style={{ maxWidth: "100%", height: "auto" }}
-                    />
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        textAlign: "center",
-                        color: "rgba(0, 0, 0, 1)",
-                        fontSize: "20px",
-                        fontWeight: "700",
-                      }}
-                    >
-                      {Math.round(forecast.main.temp - 273.15)}&deg;C
-                    </Typography>
-                  </Grid>
-                ))}
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          textAlign: "center",
+                          padding: 1,
+                          fontSize: "14px",
+                          color: "rgba(0, 0, 0, 0.4)",
+                          fontWeight: "700",
+                        }}
+                      >
+                        {new Date(forecast.dt * 1000).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </Typography>
+                      <img
+                        src={`http://openweathermap.org/img/wn/${forecast.weather[0].icon}.png`}
+                        alt={forecast.weather[0].main}
+                        style={{ maxWidth: "100%", height: "auto" }}
+                      />
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          textAlign: "center",
+                          color: "rgba(0, 0, 0, 1)",
+                          fontSize: "20px",
+                          fontWeight: "700",
+                        }}
+                      >
+                        {Math.round(forecast.main.temp - 273.15)}&deg;C
+                      </Typography>
+                    </Grid>
+                  ))}
             </Grid>
           </Grid>
 
@@ -269,7 +303,7 @@ export const ResponsiveDrawer = ({
                   paragraph
                 >
                   <strong>
-                    {Math.round(weatherData.main.feels_like - 273.15)}&deg;C
+                    {/* {Math.round(weatherData.main.feels_like - 273.15)}&deg;C */}
                   </strong>
                 </Typography>
               </Grid>
@@ -300,7 +334,7 @@ export const ResponsiveDrawer = ({
                   paragraph
                 >
                   <strong>
-                    {Math.round(weatherData.wind.speed * 3.6)} km/h
+                    {/* {Math.round(weatherData.wind.speed * 3.6)} km/h */}
                   </strong>
                 </Typography>
               </Grid>
@@ -367,7 +401,7 @@ export const ResponsiveDrawer = ({
             </Grid>
           </Grid>
         </>
-      )} */}
+      )}
     </Box>
   );
 };

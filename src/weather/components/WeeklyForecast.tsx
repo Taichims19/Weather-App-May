@@ -1,50 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Grid, Typography, Box } from "@mui/material";
-import { weatherDailyForecast } from "../hooks/weatherMapData"; // Verifica la ruta
-import { getNewWheathers } from "../../store/weather/weatherSlice";
-import { empityWheather } from "../../helpers/Wheater";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
-
-// Definir la interfaz para los datos de un día del pronóstico
-interface WeatherDay {
-  valid_date: string;
-  weather: {
-    icon: string;
-    description: string;
-  };
-  max_temp: number;
-  min_temp: number;
-}
+import { fetchWeatherListData } from "../../store/weather/thunksWeatherData";
 
 // Definir la interfaz para las propiedades del componente WeeklyForecast
 interface WeeklyForecastProps {
   city: string; // Se requiere la ciudad
 }
 
-const WeeklyForecast: React.FC<WeeklyForecastProps> = ({
-  city,
-}: WeeklyForecastProps) => {
+const WeeklyForecast: React.FC<WeeklyForecastProps> = ({ city }) => {
   const dispatch = useDispatch();
   const { listWeatherData } = useSelector((state: RootState) => state.weather);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await weatherDailyForecast(city);
-        if (response) {
-          dispatch(getNewWheathers(response));
-        } else {
-          const data = empityWheather;
-          dispatch(getNewWheathers(data));
-        }
-      } catch (error) {
-        console.error("Error al obtener el pronóstico del tiempo:", error);
-      }
-    };
-
-    fetchData();
-  }, [city]);
+    fetchWeatherListData(city); // Llamar al thunk fetchWeatherListData
+  }, [city, dispatch]);
 
   const translateWeather = (description: string) => {
     const weatherTranslations: { [key: string]: string } = {
