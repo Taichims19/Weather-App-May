@@ -15,6 +15,7 @@ import {
   setWeatherData,
 } from "./weatherSlice";
 import { empityWheather } from "../../helpers/Wheater";
+import { WeatherbitData } from "../../helpers/interfacesWeather";
 
 export const fetchWeatherListData = createAsyncThunk(
   // Pronostico 7 Days
@@ -42,46 +43,30 @@ export const fetchWeatherListData = createAsyncThunk(
   }
 );
 
+// Datos de WeatherBit para precipitaciones y UV
 export const fetchWeatherBitData = createAsyncThunk(
-  // Datos de WeatherBit para precipitaciones y UV
   "weather/fetchWeatherBitData",
   async (
     { lat, lon }: { lat: number; lon: number },
     { dispatch, rejectWithValue }
   ) => {
     try {
-      dispatch(setLoading(true)); // Indicar que la carga ha comenzado
+      dispatch(setLoading(true));
 
-      const weatherBitData = await getWeatherBitData(lat, lon);
+      const weatherBitData: WeatherbitData = await getWeatherBitData(lat, lon);
 
       if (weatherBitData) {
-        dispatch(
-          setTodayChange({
-            weatherBitData,
-            hourlyData: undefined,
-            count: 0,
-            data: [],
-          })
-        );
-      } else {
-        dispatch(
-          setTodayChange({
-            weatherBitData: { chanceOfRain: 0, uvIndex: 0 },
-            hourlyData: undefined,
-            count: 0,
-            data: [],
-          })
-        ); // Ajusta según tu lógica
+        dispatch(setTodayChange(weatherBitData));
       }
 
-      dispatch(setLoading(false)); // Indicar que la carga ha terminado
+      dispatch(setLoading(false));
     } catch (error: any) {
-      dispatch(setError(error.response ? error.response.data : error.message)); // Manejar el error
+      dispatch(setError(error.response ? error.response.data : error.message));
       return rejectWithValue(
         error.response ? error.response.data : error.message
       );
     } finally {
-      dispatch(setLoading(false)); // Indicar que la carga ha terminado
+      dispatch(setLoading(false));
     }
   }
 );

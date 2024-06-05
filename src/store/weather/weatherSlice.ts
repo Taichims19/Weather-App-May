@@ -1,5 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
+  DetailedWeatherData,
   WeatherData,
   WeatherbitData,
   WheaterState,
@@ -9,7 +10,6 @@ const initialState: WheaterState = {
   listWeatherData: [],
   weatherData: null,
   hourlyForecast: null,
-  hourlyData: null,
   weatherBitData: null,
   data: null,
   todayWheather: null,
@@ -31,20 +31,14 @@ export const weatherSlice = createSlice({
     setTodayChange(state, action: PayloadAction<WeatherbitData>) {
       //UV Index y Change of Rain
       console.log("action.payload ", action.payload);
-      if (action.payload.weatherBitData) {
-        state.weatherBitData = action.payload.weatherBitData;
-      }
-      if (action.payload.hourlyData) {
-        state.hourlyData = action.payload.hourlyData;
-      }
-      if (action.payload.data) {
-        state.data = action.payload.data;
-      }
+      state.weatherBitData = action.payload;
     },
     setHourlyForecast(state, action: PayloadAction<any>) {
+      // Pronóstico horario
       state.hourlyForecast = action.payload;
     },
-    setWeatherData(state, action: PayloadAction<any>) {
+    setWeatherData(state, action: PayloadAction<DetailedWeatherData>) {
+      // Datos meteorológicos del dia
       state.weatherData = action.payload;
     },
     setLoading(state, action: PayloadAction<boolean>) {

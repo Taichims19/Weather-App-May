@@ -58,8 +58,7 @@ export interface WheaterState {
   listWeatherData: WeatherData[];
   todayWheather: any;
   weatherData: any;
-  hourlyData: any;
-  weatherBitData: any;
+  weatherBitData: WeatherbitData | null;
   data: any;
   hourlyForecast: any;
   loading: boolean;
@@ -115,13 +114,13 @@ export interface DetailedWeatherData {
 
 // UV Index and Change of Rain
 export interface WeatherbitData {
-  weatherBitData:
-    | {
-        chanceOfRain: number;
-        uvIndex: number;
-      }
-    | any;
-  hourlyData: any;
+  name: ReactNode;
+  chanceOfRain: number;
+  uvIndex(uvIndex: any): import("react").ReactNode;
+  weatherBitData: {
+    chanceOfRain: number;
+    uvIndex: number;
+  };
   count: number;
   data: {
     app_temp: number;

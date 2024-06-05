@@ -7,6 +7,7 @@ import {
   WEATHERBIT_API_KEY,
   WEATHERBIT_FORECAST_URL,
 } from "./constCallsApi";
+import { WeatherbitData } from "../../helpers/interfacesWeather";
 
 // Variable para controlar si debemos evitar hacer llamadas a la API después de errores
 let apiCallBlockedUntil = 0;
@@ -85,15 +86,14 @@ export const weatherHourlyForecast = async (
 export const getWeatherBitData = async (
   lat: number,
   lon: number
-): Promise<any> => {
-  checkApiCallBlock();
+): Promise<WeatherbitData> => {
   const cacheKey = `weatherbit-${lat}-${lon}`;
   const cached = localStorage.getItem(cacheKey);
 
   if (cached) {
     const cachedData = JSON.parse(cached);
     if (Date.now() - cachedData.timestamp < 3600000) {
-      return cachedData.data; // Usar datos de caché si son recientes
+      return cachedData.data;
     }
   }
 
@@ -102,7 +102,14 @@ export const getWeatherBitData = async (
       `${WEATHERBIT_BASE_URL}?lat=${lat}&lon=${lon}&key=${WEATHERBIT_API_KEY}`
     );
     const data = response.data.data[0];
-    const result = { chanceOfRain: data.precip, uvIndex: data.uv };
+    const result: WeatherbitData = {
+      weatherBitData: {
+        chanceOfRain: data.precip,
+        uvIndex: data.uv,
+      },
+      count: 1,
+      data: response.data.data,
+    };
 
     localStorage.setItem(
       cacheKey,
@@ -110,10 +117,9 @@ export const getWeatherBitData = async (
     );
     return result;
   } catch (error) {
-    handleApiError(error);
+    throw error;
   }
 };
-
 // Pronóstico diario de OpenWeatherMap para 7 días
 export const weatherDailyForecast = async (city: string): Promise<any> => {
   checkApiCallBlock();
