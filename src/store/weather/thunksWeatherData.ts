@@ -14,7 +14,7 @@ import {
   setTodayChange,
   setWeatherData,
 } from "./weatherSlice";
-import { empityWheather } from "../../helpers/Wheater";
+import { defaultWeatherData, empityWheather } from "../../helpers/Wheater";
 import { WeatherbitData } from "../../helpers/interfacesWeather";
 
 export const fetchWeatherListData = createAsyncThunk(
@@ -112,7 +112,7 @@ export const fetchWeatherMapData = createAsyncThunk(
       if (weatherData) {
         dispatch(setWeatherData(weatherData));
       } else {
-        dispatch(setWeatherData(null)); // Ajusta según tu lógica
+        dispatch(setWeatherData(defaultWeatherData)); // Ajusta según tu lógica
       }
 
       dispatch(setLoading(false)); // Indicar que la carga ha terminado

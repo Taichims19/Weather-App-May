@@ -62,6 +62,7 @@ export interface WheaterState {
   data: any;
   hourlyForecast: any;
   loading: boolean;
+  coordinates: any;
   error: any;
 }
 
@@ -114,9 +115,9 @@ export interface DetailedWeatherData {
 
 // UV Index and Change of Rain
 export interface WeatherbitData {
-  name: ReactNode;
+  name: string;
   chanceOfRain: number;
-  uvIndex(uvIndex: any): import("react").ReactNode;
+  uvIndex: number;
   weatherBitData: {
     chanceOfRain: number;
     uvIndex: number;

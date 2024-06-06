@@ -7,7 +7,11 @@ import {
   WEATHERBIT_API_KEY,
   WEATHERBIT_FORECAST_URL,
 } from "./constCallsApi";
-import { WeatherbitData } from "../../helpers/interfacesWeather";
+import {
+  DetailedWeatherData,
+  WeatherbitData,
+} from "../../helpers/interfacesWeather";
+import { defaultWeatherData } from "../../helpers/Wheater";
 
 // Variable para controlar si debemos evitar hacer llamadas a la API después de errores
 let apiCallBlockedUntil = 0;
@@ -42,7 +46,9 @@ const checkApiCallBlock = () => {
 };
 
 // Datos meteorológicos de OpenWeatherMap
-export const weatherMapData = async (city: string): Promise<any> => {
+export const weatherMapData = async (
+  city: string
+): Promise<DetailedWeatherData> => {
   checkApiCallBlock();
   const cacheKey = `weather-${city}`;
   const cached = localStorage.getItem(cacheKey);
@@ -63,9 +69,10 @@ export const weatherMapData = async (city: string): Promise<any> => {
     return data;
   } catch (error) {
     handleApiError(error);
+    // En caso de error, devolver un objeto vacío
+    return defaultWeatherData; // Devuelve el objeto de respaldo en caso de error
   }
 };
-
 // Pronóstico horario de OpenWeatherMap
 export const weatherHourlyForecast = async (
   lat: number,
@@ -103,11 +110,14 @@ export const getWeatherBitData = async (
     );
     const data = response.data.data[0];
     const result: WeatherbitData = {
+      name: data.city_name, // Necesario agregar esta propiedad
+      chanceOfRain: data.precip, // Necesario agregar esta propiedad
+      uvIndex: data.uv, // Necesario agregar esta propiedad
       weatherBitData: {
         chanceOfRain: data.precip,
         uvIndex: data.uv,
       },
-      count: 1,
+      count: response.data.count,
       data: response.data.data,
     };
 

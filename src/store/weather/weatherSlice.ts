@@ -11,8 +11,9 @@ const initialState: WheaterState = {
   weatherData: null,
   hourlyForecast: null,
   weatherBitData: null,
-  data: null,
+  data: null, // Cambia 'any[]' al tipo adecuado si es posible
   todayWheather: null,
+  coordinates: null,
   loading: false,
   error: null,
 };
