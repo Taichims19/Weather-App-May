@@ -62,7 +62,7 @@ export interface WheaterState {
   data: any;
   hourlyForecast: any;
   loading: boolean;
-  coordinates: any;
+  coordinates: { lat: number; lon: number } | null;
   error: any;
 }
 

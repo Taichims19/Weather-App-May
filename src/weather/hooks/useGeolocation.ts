@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from "react";
+import axios from "axios";
+// import { useDispatch } from "react-redux";
 
 interface Location {
   loaded: boolean;
-  coordinates: { lat: string; lon: string };
+  coordinates: { lat: number; lon: number };
   city: string | null;
   error: string | null;
 }
@@ -11,12 +12,14 @@ interface Location {
 const useGeolocationAndCity = () => {
   const [location, setLocation] = useState<Location>({
     loaded: false,
-    coordinates: { lat: '', lon: '' },
+    coordinates: { lat: 0, lon: 0 },
     city: null,
     error: null,
   });
   // Agregamos un estado para controlar las actualizaciones
   const [updateCount, setUpdateCount] = useState(0);
+
+  // const dispatch = useDispatch(); // Inicializa useDispatch
 
   const getCityFromCoordinates = async (lat: any, lon: any) => {
     try {
@@ -28,18 +31,20 @@ const useGeolocationAndCity = () => {
         response.data.results[0].components.town;
       return address;
     } catch (error) {
-      console.error('Error fetching city from coordinates:', error);
-      return '';
+      console.error("Error fetching city from coordinates:", error);
+      return "";
     }
   };
 
-  const onSuccess = async (position: { coords: { latitude: number; longitude: number; }; }) => {
-    console.log('Posición obtenida:', position);
+  const onSuccess = async (position: {
+    coords: { latitude: number; longitude: number };
+  }) => {
+    console.log("Posición obtenida:", position);
     const { latitude, longitude } = position.coords;
-    const city = await getCityFromCoordinates(latitude.toString(), longitude.toString());
+    const city = await getCityFromCoordinates(latitude, longitude);
     setLocation({
       loaded: true,
-      coordinates: { lat: latitude.toString(), lon: longitude.toString() },
+      coordinates: { lat: latitude, lon: longitude },
       city,
       error: null,
     });
@@ -49,15 +54,15 @@ const useGeolocationAndCity = () => {
     setLocation((prevState) => ({
       ...prevState,
       loaded: true,
-      error: 'message' in error ? error.message : 'An unknown error occurred',
+      error: "message" in error ? error.message : "An unknown error occurred",
     }));
   };
 
   useEffect(() => {
-    if (!('geolocation' in navigator)) {
+    if (!("geolocation" in navigator)) {
       onError({
         code: 0,
-        message: 'Geolocation not supported',
+        message: "Geolocation not supported",
       });
       return;
     }
@@ -77,10 +82,10 @@ const useGeolocationAndCity = () => {
         async (position) => {
           try {
             const { latitude, longitude } = position.coords;
-            const city = await getCityFromCoordinates(latitude.toString(), longitude.toString());
+            const city = await getCityFromCoordinates(latitude, longitude);
             setLocation({
               loaded: true,
-              coordinates: { lat: latitude.toString(), lon: longitude.toString() },
+              coordinates: { lat: latitude, lon: longitude },
               city,
               error: null,
             });
@@ -89,9 +94,9 @@ const useGeolocationAndCity = () => {
             setLocation((prevState) => ({
               ...prevState,
               loaded: true,
-              error: 'Error fetching city',
+              error: "Error fetching city",
             }));
-            reject('Error fetching city');
+            reject("Error fetching city");
           }
         },
         (error) => {

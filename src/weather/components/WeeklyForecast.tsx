@@ -14,7 +14,7 @@ const WeeklyForecast: React.FC<WeeklyForecastProps> = ({ city }) => {
   const { listWeatherData } = useSelector((state: RootState) => state.weather);
 
   useEffect(() => {
-    fetchWeatherListData(city); // Llamar al thunk fetchWeatherListData
+    fetchWeatherListData(city, dispatch); // Llama a fetchWeatherListData con city y dispatch como argumentos
   }, [city, dispatch]);
 
   const translateWeather = (description: string) => {

@@ -4,7 +4,7 @@ import { ResponsiveNavBar } from "../components/NavBar";
 import ResponsiveDrawer from "../components/ResponsiveDrawer";
 import WeeklyForecast from "../components/WeeklyForecast";
 
-const drawerWidth = 240;
+// const drawerWidth = 240;
 
 export const WeatherLayout = () => {
   const [selectedCity, setSelectedCity] = useState<string>("");
@@ -31,7 +31,6 @@ export const WeatherLayout = () => {
         <ResponsiveNavBar />
 
         <ResponsiveDrawer
-          drawerWidth={drawerWidth}
           onCityChange={handleCityChange}
           sx={{ flex: 1, minWidth: "60%" }}
         />

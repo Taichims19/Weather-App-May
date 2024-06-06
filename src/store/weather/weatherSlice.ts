@@ -29,6 +29,13 @@ export const weatherSlice = createSlice({
     setNewTodayWheather(state, action: PayloadAction<any>) {
       state.todayWheather = action.payload;
     },
+    setCoordinates: (
+      //Manejo de actualizador del estado con coordenadas
+      state,
+      action: PayloadAction<{ lat: number; lon: number }>
+    ) => {
+      state.coordinates = action.payload;
+    },
     setTodayChange(state, action: PayloadAction<WeatherbitData>) {
       //UV Index y Change of Rain
       console.log("action.payload ", action.payload);
@@ -55,6 +62,7 @@ export const weatherSlice = createSlice({
 export const {
   getNewWheathers,
   setNewTodayWheather,
+  setCoordinates,
   setTodayChange,
   setHourlyForecast,
   setWeatherData,

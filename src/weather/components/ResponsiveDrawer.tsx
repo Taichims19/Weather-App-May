@@ -34,80 +34,41 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({
 
   const dispatch = useDispatch();
 
-  const { weatherBitData, hourlyForecast, weatherData, loading } = useSelector(
-    (state: RootState) => state.weather
-  );
+  const { weatherBitData, hourlyForecast, weatherData, loading, coordinates } =
+    useSelector((state: RootState) => state.weather);
 
-  const coordinates = useSelector(
-    (state: RootState) => state.weather.coordinates
-  );
   const { lat, lon } = coordinates || {};
 
   // Utilizamos el hook de geolocalización
   const { refreshLocation } = useGeolocationAndCity();
 
   // Efecto para disparar la búsqueda inicial o cuando cambia la ciudad en la geolocalización
-
-  // Efecto para disparar la búsqueda inicial o cuando cambia la ciudad en la geolocalización
   useEffect(() => {
     if (inputCity && lat !== undefined && lon !== undefined) {
-      // Llama al thunk correspondiente para obtener los datos meteorológicos
-      // Datos meteorológicos de OpenWeatherMap
-      dataWeatherData(inputCity);
-      // Datos de WeatherBit para precipitaciones y UV
-      dataWeatherbBitData({ lat, lon });
-      // Pronóstico horario de OpenWeatherMap
-      dataHourlyForecast({ lat, lon });
-      onCityChange(inputCity);
+      fetchData();
     }
   }, [inputCity, lat, lon]);
 
-  const dataWeatherData = async (city: string) => {
-    dispatch(fetchWeatherMapData(city));
-  };
-  const dataWeatherbBitData = async ({
-    lat,
-    lon,
-  }: {
-    lat: number;
-    lon: number;
-  }) => {
-    fetchWeatherBitData({ lat, lon });
-  };
-  const dataHourlyForecast = async ({
-    lat,
-    lon,
-  }: {
-    lat: number;
-    lon: number;
-  }) => {
-    fetchWeatherHourlyForecast({ lat, lon }); // Llama al thunk fetchWeatherHourlyForecast
-  };
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputCity.trim()) return;
-    // Invocamos la función onCityChange con la ciudad buscada
-    onCityChange(inputCity);
-    // Disparamos la acción para obtener los datos del clima
-    dataWeatherData(inputCity);
-    // Datos de WeatherBit para precipitaciones y UV
-    dataWeatherbBitData({ lat, lon });
-    // Pronóstico horario de OpenWeatherMap
-    dataHourlyForecast({ lat, lon });
-    // Limpiamos el input después de la búsqueda
-    setInputCity("");
+  const fetchData = async () => {
+    if (lat !== undefined && lon !== undefined) {
+      await fetchWeatherMapData(inputCity, dispatch);
+      await fetchWeatherBitData({ lat, lon }, dispatch);
+      await fetchWeatherHourlyForecast({ lat, lon }, dispatch);
+      onCityChange(inputCity);
+    } else {
+      console.error("Error: Latitud o longitud no definidas");
+    }
   };
 
-  const handleRefreshLocation = () => {
-    refreshLocation()
-      .then((newCity: string | null) => {
-        if (newCity) {
-          setInputCity(newCity);
-        }
-      })
-      .catch((error: any) => {
-        console.error("Error refreshing location:", error);
-      });
+  const onSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    if (!inputCity.trim()) return;
+
+    setInputCity(inputCity.trim());
+  };
+
+  const handleRefreshLocation = async () => {
+    await refreshLocation();
   };
   return (
     <Box
