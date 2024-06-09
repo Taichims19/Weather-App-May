@@ -2,20 +2,23 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
   DetailedWeatherData,
   WeatherData,
+  WeatherDataForecast,
   WeatherbitData,
   WheaterState,
 } from "../../helpers/interfacesWeather";
+import { defaultWeatherDataForecast } from "../../helpers/Wheater";
 
 const initialState: WheaterState = {
   listWeatherData: [],
   weatherData: null,
-  hourlyForecast: null,
+  hourlyForecast: defaultWeatherDataForecast,
   weatherBitData: null,
   data: null, // Cambia 'any[]' al tipo adecuado si es posible
   todayWheather: null,
   coordinates: null,
   loading: false,
   error: null,
+  city: "",
 };
 
 export const weatherSlice = createSlice({
@@ -26,8 +29,8 @@ export const weatherSlice = createSlice({
       //list 7 days from weatherbit in weeklyForecast
       state.listWeatherData = action.payload;
     },
-    setNewTodayWheather(state, action: PayloadAction<any>) {
-      state.todayWheather = action.payload;
+    setNewCity(state, action: PayloadAction<any>) {
+      state.city = action.payload;
     },
     setCoordinates: (
       //Manejo de actualizador del estado con coordenadas
@@ -41,7 +44,7 @@ export const weatherSlice = createSlice({
       console.log("action.payload ", action.payload);
       state.weatherBitData = action.payload;
     },
-    setHourlyForecast(state, action: PayloadAction<any>) {
+    setHourlyForecast(state, action: PayloadAction<WeatherDataForecast>) {
       // Pronóstico horario
       state.hourlyForecast = action.payload;
     },
@@ -61,7 +64,7 @@ export const weatherSlice = createSlice({
 // Exportar los action creators para usar en los componentes
 export const {
   getNewWheathers,
-  setNewTodayWheather,
+  setNewCity,
   setCoordinates,
   setTodayChange,
   setHourlyForecast,

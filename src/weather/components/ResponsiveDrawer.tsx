@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchWeatherBitData,
@@ -22,58 +22,75 @@ import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import useGeolocationAndCity from "../hooks/useGeolocation";
 import { RootState } from "../../store";
+import { setLoading, setNewCity } from "../../store/weather/weatherSlice";
 
 interface ResponsiveDrawerProps {
-  onCityChange: (city: string) => void;
+  sx: any;
 }
 
-const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({
-  onCityChange,
-}) => {
-  const [inputCity, setInputCity] = useState("");
-
+const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
   const dispatch = useDispatch();
 
-  const { weatherBitData, hourlyForecast, weatherData, loading, coordinates } =
-    useSelector((state: RootState) => state.weather);
-
-  const { lat, lon } = coordinates || {};
+  const {
+    weatherBitData,
+    hourlyForecast,
+    weatherData,
+    loading,
+    coordinates,
+    city,
+  } = useSelector((state: RootState) => state.weather);
 
   // Utilizamos el hook de geolocalización
   const { refreshLocation } = useGeolocationAndCity();
 
-  // Efecto para disparar la búsqueda inicial o cuando cambia la ciudad en la geolocalización
+  // Efecto para disparar la búsqueda inicial o cuando cambia la ciudad
   useEffect(() => {
-    if (inputCity && lat !== undefined && lon !== undefined) {
-      fetchData();
-    }
-  }, [inputCity, lat, lon]);
+    const checkCity = setTimeout(() => {
+      fetchData(city);
+    }, 1000);
 
-  const fetchData = async () => {
-    if (lat !== undefined && lon !== undefined) {
-      await fetchWeatherMapData(inputCity, dispatch);
-      await fetchWeatherBitData({ lat, lon }, dispatch);
-      await fetchWeatherHourlyForecast({ lat, lon }, dispatch);
-      onCityChange(inputCity);
-    } else {
-      console.error("Error: Latitud o longitud no definidas");
+    clearTimeout(checkCity);
+  }, [city]);
+
+  const fetchData = async (city: string) => {
+    try {
+      dispatch(setLoading(true));
+      await fetchWeatherMapData(city, dispatch);
+
+      const { lat, lon } = coordinates || {};
+
+      if (lat !== undefined && lon !== undefined) {
+        await fetchWeatherBitData({ lat, lon }, dispatch);
+        await fetchWeatherHourlyForecast({ lat, lon }, dispatch);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 
   const onSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    if (!inputCity.trim()) return;
+    if (city.length === 0) return;
 
-    setInputCity(inputCity.trim());
+    await fetchData(city); // Llama a fetchData con la ciudad actualizada
   };
 
   const handleRefreshLocation = async () => {
     await refreshLocation();
   };
+
   return (
     <Box
       component="main"
-      sx={{ flexGrow: 1, paddingLeft: "8px", paddingTop: "2px", width: "100%" }}
+      sx={{
+        flexGrow: 1,
+        paddingLeft: "8px",
+        paddingTop: "2px",
+        width: "100%",
+        ...sx,
+      }}
     >
       <Grid container sx={{ width: "96%", borderRadius: 2 }}>
         <form onSubmit={onSubmit} className="searchForm">
@@ -91,7 +108,11 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({
               sx={{ width: "90%", marginLeft: "6px" }}
               type="text"
               placeholder="Search for cities"
-              onChange={(e) => setInputCity(e.target.value)}
+              onChange={(e) => {
+                dispatch(setNewCity(e.target.value));
+
+                //setInputCity(e.target.value);
+              }}
             />
             <button type="submit">
               <SearchIcon />
@@ -124,16 +145,16 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({
           <CircularProgress />
         </Box>
       )}
-      {!loading && weatherBitData && (
+      {!loading && (
         <>
           <Typography sx={{ marginLeft: "5%", marginTop: "4%" }} variant="h4">
-            <strong>{weatherBitData.name}</strong>
+            <strong>
+              {weatherData?.name} | {weatherData?.sys.country}
+            </strong>
           </Typography>
           <div>
             <Typography sx={{ marginLeft: "5%", fontSize: "14px" }} paragraph>
-              Chance of Rain:{" "}
-              {weatherBitData.data[0].precip > 0 ? "100%" : "0%"} |{" "}
-              {weatherBitData.chanceOfRain > 0 ? "100%" : "0%"}
+              Chance of Rain: {weatherBitData?.chanceOfRain > 0 ? "100%" : "0%"}
             </Typography>
             <br />
             <br />
@@ -141,10 +162,7 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({
           </div>
           <Typography sx={{ marginLeft: "5%" }} variant="h3">
             <strong>
-              {parseFloat(
-                (weatherData.main.temp - 273.15).toFixed(0)
-              ).toString()}
-              &deg;C
+              {parseFloat(weatherData?.main.temp - 273.15).toFixed(0)}&deg;C
             </strong>
           </Typography>
 
@@ -275,10 +293,7 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({
                   paragraph
                 >
                   <strong>
-                    {parseFloat(
-                      (weatherBitData.data[0].temp - 273.15).toFixed(0)
-                    ).toString()}
-                    &deg;C
+                    {Math.round(weatherData?.main?.feels_like - 273.15)}&deg;C
                   </strong>
                 </Typography>
               </Grid>
@@ -309,11 +324,8 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({
                   paragraph
                 >
                   <strong>
-                    {weatherBitData &&
-                    weatherBitData.data &&
-                    weatherBitData.data[0] &&
-                    weatherBitData.data[0].wind_spd
-                      ? Math.round(weatherBitData.data[0].wind_spd * 3.6)
+                    {weatherData?.wind?.speed
+                      ? Math.round(weatherData.wind.speed * 3.6)
                       : "N/A"}{" "}
                     km/h
                   </strong>
@@ -335,9 +347,8 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({
                   paragraph
                 >
                   <WaterDropIcon sx={{ mr: 1 }} />
-                  Chance of Rain:{" "}
-                  {weatherBitData.data[0].precip > 0 ? "100%" : "0%"} |{" "}
-                  {weatherBitData.chanceOfRain > 0 ? "100%" : "0%"}
+                  Chance of Rain:
+                  {/* {weatherBitData?.chanceOfRain ?? 0 > 0 ? "100%" : "0%"} */}
                 </Typography>
                 <Typography
                   sx={{
@@ -348,11 +359,7 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({
                   paragraph
                 >
                   <strong>
-                    {weatherBitData &&
-                    weatherBitData.data &&
-                    weatherBitData.data[0].precip > 0
-                      ? "100%"
-                      : "0%"}
+                    {weatherBitData?.chanceOfRain > 0 ? "100%" : "0%"}
                   </strong>
                 </Typography>
               </Grid>
@@ -382,7 +389,9 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({
                   }}
                   paragraph
                 >
-                  <strong>{weatherBitData.data[0].uv}</strong>
+                  <strong>
+                    {Math.round(weatherBitData?.data[0]?.uv || 0)}
+                  </strong>
                 </Typography>
               </Grid>
             </Grid>

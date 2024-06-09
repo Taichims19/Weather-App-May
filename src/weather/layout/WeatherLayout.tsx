@@ -3,16 +3,13 @@ import { Box, Grid, Typography } from "@mui/material";
 import { ResponsiveNavBar } from "../components/NavBar";
 import ResponsiveDrawer from "../components/ResponsiveDrawer";
 import WeeklyForecast from "../components/WeeklyForecast";
+import { RootState } from "../../store";
+import { useSelector } from "react-redux";
 
 // const drawerWidth = 240;
 
 export const WeatherLayout = () => {
-  const [selectedCity, setSelectedCity] = useState<string>("");
-
-  const handleCityChange = (city: string) => {
-    setSelectedCity(city);
-  };
-
+  const { city } = useSelector((state: RootState) => state.weather);
   return (
     <Grid container sx={{ backgroundColor: "rgba(29, 159, 253, 1)" }}>
       <Grid
@@ -30,15 +27,12 @@ export const WeatherLayout = () => {
       >
         <ResponsiveNavBar />
 
-        <ResponsiveDrawer
-          onCityChange={handleCityChange}
-          sx={{ flex: 1, minWidth: "60%" }}
-        />
+        <ResponsiveDrawer sx={{ flex: 1, minWidth: "60%" }} />
         {/* Sidebar drawerWidth*/}
 
         <Box component="main" sx={{ flex: 1, minWidth: "30%" }}>
-          <WeeklyForecast selectedCity={selectedCity} />
-          <Typography variant="h5"> {selectedCity}</Typography>
+          <WeeklyForecast />
+          <Typography variant="h5"> {city}</Typography>
         </Box>
       </Grid>
     </Grid>

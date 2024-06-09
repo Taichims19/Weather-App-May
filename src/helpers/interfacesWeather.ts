@@ -57,13 +57,14 @@ export interface WeatherDay {
 export interface WheaterState {
   listWeatherData: WeatherData[];
   todayWheather: any;
-  weatherData: any;
-  weatherBitData: WeatherbitData | null;
+  weatherData: DetailedWeatherData | null;
+  weatherBitData: WeatherbitData | null; // Permitir null
   data: any;
-  hourlyForecast: any;
+  hourlyForecast: WeatherDataForecast;
   loading: boolean;
   coordinates: { lat: number; lon: number } | null;
   error: any;
+  city: string;
 }
 
 export interface DetailedWeatherData {
@@ -91,7 +92,6 @@ export interface DetailedWeatherData {
   wind: {
     speed: number;
     deg: number;
-    gust: number;
   };
   rain?: {
     "1h": number;
@@ -167,4 +167,63 @@ export interface WeatherbitData {
     wind_dir: number;
     wind_spd: number;
   }[];
+}
+
+export interface WeatherDataForecast {
+  cod: string;
+  message: number;
+  cnt: number;
+  list: WeatherEntry[];
+  city: City;
+}
+
+interface WeatherEntry {
+  dt: number; // Timestamp en segundos desde la época de Unix (1/1/1970)
+  main: {
+    temp: number; // Temperatura en Kelvin
+    feels_like: number; // Sensación térmica en Kelvin
+    temp_min: number; // Temperatura mínima en Kelvin
+    temp_max: number; // Temperatura máxima en Kelvin
+    pressure: number; // Presión atmosférica en hPa
+    sea_level: number; // Presión atmosférica a nivel del mar en hPa
+    grnd_level: number; // Presión atmosférica a nivel del suelo en hPa
+    humidity: number; // Humedad relativa en porcentaje
+    temp_kf: number; // Diferencia entre temperatura mínima y máxima en Kelvin
+  };
+  weather: WeatherDescription[];
+  clouds: {
+    all: number; // Porcentaje de nubosidad
+  };
+  wind: {
+    speed: number; // Velocidad del viento en m/s
+    deg: number; // Dirección del viento en grados (en relación al norte)
+    gust: number; // Ráfaga máxima del viento en m/s
+  };
+  visibility: number; // Visibilidad en metros
+  pop: number; // Probabilidad de precipitación en porcentaje (0 a 1)
+  sys: {
+    pod: string; // Parte del día (d = día, n = noche)
+  };
+  dt_txt: string; // Fecha y hora en formato ISO 8601 (YYYY-MM-DD HH:MM:SS)
+}
+
+interface WeatherDescription {
+  id: number; // Identificador del tiempo (referencia externa)
+  main: string; // Descripción principal del tiempo (ej. Clouds)
+  description: string; // Descripción detallada del tiempo (ej. scattered clouds)
+  icon: string; // Código del ícono del tiempo (referencia externa)
+}
+
+interface City {
+  id: number; // Identificador de la ciudad
+  name: string; // Nombre de la ciudad
+  coord: {
+    lat: number; // Latitud geográfica
+    lon: number; // Longitud geográfica
+  };
+  country: string; // Código del país (ej. US)
+  population: number; // Población de la ciudad
+  timezone: number; // Desplazamiento horario en segundos
+  sunrise: number; // Timestamp del amanecer en segundos desde la época de Unix
+  sunset: number; // Timestamp del atardecer en segundos desde la época de Unix
 }

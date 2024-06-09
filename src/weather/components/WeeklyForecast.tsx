@@ -5,13 +5,13 @@ import { RootState } from "../../store";
 import { fetchWeatherListData } from "../../store/weather/thunksWeatherData";
 
 // Definir la interfaz para las propiedades del componente WeeklyForecast
-interface WeeklyForecastProps {
-  city: string; // Se requiere la ciudad
-}
+interface WeeklyForecastProps {}
 
-const WeeklyForecast: React.FC<WeeklyForecastProps> = ({ city }) => {
+const WeeklyForecast: React.FC<WeeklyForecastProps> = () => {
   const dispatch = useDispatch();
-  const { listWeatherData } = useSelector((state: RootState) => state.weather);
+  const { listWeatherData, city } = useSelector(
+    (state: RootState) => state.weather
+  );
 
   useEffect(() => {
     fetchWeatherListData(city, dispatch); // Llama a fetchWeatherListData con city y dispatch como argumentos

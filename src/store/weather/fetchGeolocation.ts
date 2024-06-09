@@ -1,13 +1,13 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
 
-const API_KEY = '86799fe9255e40e3b0bf260daa082854'; // Asegúrate de usar tu propia API Key
+const API_KEY = "86799fe9255e40e3b0bf260daa082854"; // Asegúrate de usar tu propia API Key
 
 export const fetchGeolocation = createAsyncThunk(
-  'geolocation/fetchGeolocation',
+  "geolocation/fetchGeolocation",
   async (_, { rejectWithValue }) => {
-    if (!('geolocation' in navigator)) {
-      return rejectWithValue('Geolocation not supported');
+    if (!("geolocation" in navigator)) {
+      return rejectWithValue("Geolocation not supported");
     }
 
     return new Promise((resolve, reject) => {
@@ -17,7 +17,7 @@ export const fetchGeolocation = createAsyncThunk(
         enableHighAccuracy: true,
       });
     })
-      .then(async (position) => {
+      .then(async (position: any) => {
         const { latitude, longitude } = position.coords;
         try {
           const response = await axios.get(
@@ -26,23 +26,23 @@ export const fetchGeolocation = createAsyncThunk(
           const city =
             response.data.results[0].components.city ||
             response.data.results[0].components.town ||
-            '';
+            "";
           return { lat: latitude, lon: longitude, city };
         } catch (error) {
-          throw rejectWithValue('Failed to fetch city name from coordinates');
+          throw rejectWithValue("Failed to fetch city name from coordinates");
         }
       })
       .catch((error) => {
-        throw rejectWithValue(error.message || 'Failed to get geolocation');
+        throw rejectWithValue(error.message || "Failed to get geolocation");
       });
   }
 );
 
 const geolocationSlice = createSlice({
-  name: 'geolocation',
+  name: "geolocation",
   initialState: {
     coordinates: { lat: null, lon: null },
-    city: '',
+    city: "",
     loaded: false,
     error: null,
   },
@@ -67,7 +67,7 @@ const geolocationSlice = createSlice({
         state.loaded = true;
       })
       .addCase(fetchGeolocation.rejected, (state, action) => {
-        state.error = action.payload;
+        // state.error = action.payload;
         state.loaded = true;
       });
   },
