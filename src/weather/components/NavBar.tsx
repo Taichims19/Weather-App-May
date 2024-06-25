@@ -52,6 +52,7 @@ export const ResponsiveNavBar = () => {
       sx={{
         backgroundColor: "white",
         width: "100px",
+        height: "98.5%",
         backgroundColor: "rgba(0, 0, 0, 0.1)",
         borderRadius: 6,
       }}
@@ -72,7 +73,14 @@ export const ResponsiveNavBar = () => {
           aria-haspopup="true"
           onClick={handleMenu}
           color="primary"
-          sx={{ paddingTop: "5px", marginBottom: "45px" }}
+          sx={{
+            paddingTop: "5px",
+            marginBottom: "45px",
+            transition: "background-color 0.3s",
+            "&:hover": {
+              bgcolor: "rgba(0, 0, 0, 0.2)",
+            },
+          }}
         >
           <BeachAccessIcon sx={{ fontSize: "30px" }} />
         </IconButton>
@@ -94,6 +102,9 @@ export const ResponsiveNavBar = () => {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
+                "&:hover": {
+                  bgcolor: "rgba(0, 0, 0, 0.2)",
+                },
               }}
             >
               {page.icon}
@@ -103,7 +114,15 @@ export const ResponsiveNavBar = () => {
             </Button>
           ))}
         </Box>
-        <IconButton color="error" onClick={onLogout}>
+        <IconButton
+          color="error"
+          sx={{
+            "&:hover": {
+              bgcolor: "rgba(0, 0, 0, 0.2)",
+            },
+          }}
+          onClick={onLogout}
+        >
           <LogoutOutlined />
         </IconButton>
       </Toolbar>

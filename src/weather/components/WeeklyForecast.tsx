@@ -17,13 +17,22 @@ const WeeklyForecast: React.FC<WeeklyForecastProps> = () => {
     fetchWeatherListData(city, dispatch); // Llama a fetchWeatherListData con city y dispatch como argumentos
   }, [city, dispatch]);
 
-  const translateWeather = (description: string) => {
-    const weatherTranslations: { [key: string]: string } = {
-      "Clear sky": "Cielo despejado",
-      // Más traducciones...
-    };
+  // Objeto para traducir la descripción del clima a español
+  const weatherTranslations: { [key: string]: string } = {
+    "overcast clouds": "Nublado",
+    "scattered clouds": "Poco Nublado",
+    "few clouds": "Pocas Nubes",
+    "broken clouds": "Nubes Rotos",
+    "clear sky": "Despejado",
+    "light rain": "Lluvia Ligera",
+    "moderate rain": "Lluvia Moderada",
+    "heavy intensity rain": "Lluvia Intensa",
+    // Puedes agregar más traducciones según sea necesario
+  };
 
-    return weatherTranslations[description] || description;
+  // Función para obtener la descripción del clima traducida
+  const translateWeather = (description: string) => {
+    return weatherTranslations[description.toLowerCase()] || description;
   };
 
   return (
@@ -42,21 +51,35 @@ const WeeklyForecast: React.FC<WeeklyForecastProps> = () => {
       >
         <Typography
           paragraph
-          sx={{ width: "100%", textAlign: "center", marginBottom: 2 }}
+          sx={{
+            width: "100%",
+            textAlign: "center",
+            fontSize: "16px",
+            color: "rgba(0, 0, 0, 0.4)",
+            fontWeight: "900",
+            marginTop: "10%",
+            marginBottom: "7%",
+
+            marginLeft: "-13%",
+          }}
         >
-          Pronostico Climatico : 7Dias
+          Pronostico Clima 7Dias
         </Typography>
         {listWeatherData.map((day, index) => (
           <Grid
             item
-            xs={12}
+            xs={11}
             key={index}
             sx={{
               display: "flex",
-              flexDirection: "row",
+
               alignItems: "center",
-              justifyContent: "space-around",
-              marginBottom: 2,
+              justifyContent: "space-between",
+              marginBottom: "1%",
+              position: "relative",
+              bottom: "5%",
+              left: "5%",
+              borderBottom: "1px inset rgba(0.0, 0.0, 0.1)",
             }}
           >
             <Typography
@@ -65,6 +88,7 @@ const WeeklyForecast: React.FC<WeeklyForecastProps> = () => {
                 fontWeight: "900",
                 color: "rgba(0, 0, 0, 0.4)",
                 textAlign: "start",
+                width: "25%",
               }}
             >
               {new Date(day.valid_date).toLocaleDateString("es-ES", {
@@ -77,13 +101,23 @@ const WeeklyForecast: React.FC<WeeklyForecastProps> = () => {
               sx={{
                 color: "rgba(0, 0, 0, 1)",
                 fontSize: "14px",
+                alignItems: "center",
                 fontWeight: "700",
+                paddingBottom: "15px",
+                marginTop: "16px",
+                width: "55%",
+                display: "flex",
               }}
             >
               <img
                 src={`https://www.weatherbit.io/static/img/icons/${day.weather.icon}.png`}
                 alt={translateWeather(day.weather.description)}
-                style={{ width: "30px", height: "30px" }}
+                style={{
+                  width: "60px",
+                  height: "60px",
+                  paddingRight: "5%",
+                  marginTop: "1%",
+                }}
               />
               {translateWeather(day.weather.description)}
             </Typography>
@@ -93,9 +127,10 @@ const WeeklyForecast: React.FC<WeeklyForecastProps> = () => {
                 color: "rgba(0, 0, 0, 1)",
                 fontSize: "14px",
                 fontWeight: "700",
+                width: "25%",
               }}
             >
-              {Math.round(day.max_temp)}°C / {Math.round(day.min_temp)}°C
+              {Math.round(day.max_temp)} / {Math.round(day.min_temp)}
             </Typography>
           </Grid>
         ))}

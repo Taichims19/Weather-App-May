@@ -92,6 +92,7 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
         paddingLeft: "8px",
         paddingTop: "2px",
         width: "100%",
+
         ...sx,
       }}
     >
@@ -115,6 +116,7 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
                 border: "none",
                 outline: "none",
                 borderBottom: "none",
+                borderBlockStart: "none",
               }}
               type="text"
               placeholder="Search for cities"
@@ -214,8 +216,9 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
               noWrap
               sx={{
                 paddingTop: "5%",
-                paddingLeft: "5%",
+                paddingLeft: "0.5%",
                 fontSize: "16px",
+                marginLeft: "2%",
                 color: "rgba(0, 0, 0, 0.5)",
                 fontWeight: "700",
               }}
@@ -223,7 +226,11 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
             >
               TODAY´S FORECAST
             </Typography>
-            <Grid container spacing={2} sx={{ paddingBottom: "3%" }}>
+            <Grid
+              container
+              spacing={2}
+              sx={{ paddingBottom: "5%", marginLeft: "1%" }}
+            >
               {hourlyForecast &&
                 hourlyForecast.list
                   .slice(0, 6)
@@ -237,21 +244,23 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
                         flexDirection: "column",
                         alignItems: "center",
                         marginRight: "-0.5%",
+                        height: "90%",
                         justifyContent: "space-around",
+                        borderRight: "1px inset rgba(0.0, 0.0, 0.1)",
                       }}
                     >
                       <Typography
                         variant="caption"
                         sx={{
                           textAlign: "center",
-                          padding: 1,
-                          fontSize: "16px",
+
+                          fontSize: "14px",
                           color: "rgba(0, 0, 0, 0.4)",
-                          fontWeight: "700",
+                          fontWeight: "900",
                         }}
                       >
                         {new Date(forecast.dt * 1000).toLocaleTimeString([], {
-                          hour: "2-digit",
+                          hour: "numeric",
                           minute: "2-digit",
                         })}
                       </Typography>
@@ -265,7 +274,7 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
                         sx={{
                           textAlign: "center",
                           color: "rgba(0, 0, 0, 1)",
-                          fontSize: "25px",
+                          fontSize: "22px",
                           fontWeight: "700",
                         }}
                       >
