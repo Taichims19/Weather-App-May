@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Box, Grid, Typography } from "@mui/material";
 import { ResponsiveNavBar } from "../components/NavBar";
 import ResponsiveDrawer from "../components/ResponsiveDrawer";
@@ -19,8 +18,9 @@ export const WeatherLayout = () => {
           backgroundColor: "rgba(255,255,255)",
           display: "flex",
           padding: "30px",
-          margin: "20px",
+          margin: "40px",
           width: "95%",
+          marginRight: "5%",
           borderRadius: "1%",
         }}
         className="animate__animated animate__fadeIn animate__faster"
@@ -30,9 +30,14 @@ export const WeatherLayout = () => {
         <ResponsiveDrawer sx={{ flex: 1, minWidth: "60%" }} />
         {/* Sidebar drawerWidth*/}
 
-        <Box component="main" sx={{ flex: 1, minWidth: "30%" }}>
+        <Box
+          component="main"
+          sx={{ flex: 1, minWidth: "30%", height: "92.5%" }}
+        >
           <WeeklyForecast />
-          <Typography variant="h5"> {city}</Typography>
+          {/* <Typography variant="h5">
+            <strong>Clima Actual en {city}</strong>
+          </Typography> */}
         </Box>
       </Grid>
     </Grid>

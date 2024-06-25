@@ -8,41 +8,26 @@ import {
   WEATHERBIT_FORECAST_URL,
 } from "./constCallsApi";
 import {
-  DetailedWeatherData,
+  DefaultWeatherData,
   WeatherbitData,
 } from "../../helpers/interfacesWeather";
 import { defaultWeatherData } from "../../helpers/Wheater";
 
-const handleApiError = async (error: unknown) => {
-  try {
-    throw error; // Relanzar para manejarlo en la llamada
-  } catch (error: any) {
-    if (
-      error.message === "Request failed with status code 429" ||
-      (error.response.status > 400 && error.response.status < 500)
-    ) {
-      console.log("Error HTTP:", error.message);
-      // Implementar lógica de caché aquí
-    } else {
-      console.error(`Error desconocido: ${error}`);
-    }
-  }
-};
-
 // Datos meteorológicos de OpenWeatherMap
 export const weatherMapData = async (
   city: string
-): Promise<DetailedWeatherData> => {
+): Promise<DefaultWeatherData> => {
   const cacheKey = `weather-${city}`;
 
   try {
-    const { data } = await axios.get(`${BASE_URL}q=${city}&appid=${API_KEY}`); // URL corregida
-    console.log("ujhjhjhnj", data);
+    const { data } = await axios.get(`${BASE_URL}q=${city}&appid=${API_KEY}`);
+    console.log("Datos meteorológicos:", data);
 
     localStorage.setItem(
       cacheKey,
       JSON.stringify({ data, timestamp: Date.now() })
     );
+
     return data;
   } catch (error) {
     // handleApiError(error);

@@ -1,5 +1,71 @@
+export interface WeatherDay {
+  valid_date: string;
+  weather: {
+    icon: string;
+    description: string;
+  };
+  max_temp: number;
+  min_temp: number;
+}
+
+export interface WheaterState {
+  listWeatherData: WeatherData[];
+  todayWheather: any;
+  weatherData: DefaultWeatherData;
+  weatherBitData: WeatherbitData; // Permitir null
+  data: any;
+  hourlyForecast: WeatherDataForecast;
+  loading: boolean;
+  coordinates: { lat: number; lon: number } | null;
+  error: any;
+  city: string;
+}
+
+//Interface de weatherdata normal
+export interface DefaultWeatherData {
+  coord: {
+    lon: number;
+    lat: number;
+  };
+  weather: {
+    id: number;
+    main: string;
+    description: string;
+    icon: string;
+  }[];
+  base: string;
+  main: {
+    temp: number;
+    feels_like: number;
+    temp_min: number;
+    temp_max: number;
+    pressure: number;
+    humidity: number;
+  };
+  visibility: number;
+  wind: {
+    speed: number;
+    deg: number;
+  };
+  clouds: {
+    all: number;
+  };
+  dt: number;
+  sys: {
+    type: number;
+    id: number;
+    country: string;
+    sunrise: number;
+    sunset: number;
+  };
+  timezone: number;
+  id: number;
+  name: string;
+  cod: number;
+}
+
+// Pronostico 7 days
 export interface WeatherData {
-  // Pronostico 7 days
   app_max_temp: number;
   app_min_temp: number;
   clouds: number;
@@ -42,75 +108,6 @@ export interface WeatherData {
   wind_dir: number;
   wind_gust_spd: number;
   wind_spd: number;
-}
-
-export interface WeatherDay {
-  valid_date: string;
-  weather: {
-    icon: string;
-    description: string;
-  };
-  max_temp: number;
-  min_temp: number;
-}
-
-export interface WheaterState {
-  listWeatherData: WeatherData[];
-  todayWheather: any;
-  weatherData: DetailedWeatherData | null;
-  weatherBitData: WeatherbitData | null; // Permitir null
-  data: any;
-  hourlyForecast: WeatherDataForecast;
-  loading: boolean;
-  coordinates: { lat: number; lon: number } | null;
-  error: any;
-  city: string;
-}
-
-export interface DetailedWeatherData {
-  //Api openWeatherMap
-  coord: {
-    lon: number;
-    lat: number;
-  };
-  weather: {
-    id: number;
-    main: string;
-    description: string;
-    icon: string;
-  }[];
-  base: string;
-  main: {
-    temp: number;
-    feels_like: number;
-    temp_min: number;
-    temp_max: number;
-    pressure: number;
-    humidity: number;
-  };
-  visibility: number;
-  wind: {
-    speed: number;
-    deg: number;
-  };
-  rain?: {
-    "1h": number;
-  };
-  clouds: {
-    all: number;
-  };
-  dt: number;
-  sys: {
-    type: number;
-    id: number;
-    country: string;
-    sunrise: number;
-    sunset: number;
-  };
-  timezone: number;
-  id: number;
-  name: string;
-  cod: number;
 }
 
 // UV Index and Change of Rain
@@ -169,6 +166,7 @@ export interface WeatherbitData {
   }[];
 }
 
+//Pronostico horario
 export interface WeatherDataForecast {
   cod: string;
   message: number;

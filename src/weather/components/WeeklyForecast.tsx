@@ -27,12 +27,15 @@ const WeeklyForecast: React.FC<WeeklyForecastProps> = () => {
   };
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box sx={{ width: "90%", height: "100%" }}>
       <Grid
         container
         spacing={2}
         sx={{
           width: "100%",
+          height: "100%",
+          marginTop: "15%",
+          marginLeft: "3%",
           backgroundColor: "rgba(0, 0, 0, 0.1)",
           borderRadius: 2,
         }}
@@ -41,7 +44,7 @@ const WeeklyForecast: React.FC<WeeklyForecastProps> = () => {
           paragraph
           sx={{ width: "100%", textAlign: "center", marginBottom: 2 }}
         >
-          7-DAY FORECAST
+          Pronostico Climatico : 7Dias
         </Typography>
         {listWeatherData.map((day, index) => (
           <Grid
@@ -52,23 +55,23 @@ const WeeklyForecast: React.FC<WeeklyForecastProps> = () => {
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
-              justifyContent: "center",
+              justifyContent: "space-around",
               marginBottom: 2,
             }}
           >
             <Typography
               variant="subtitle2"
-              sx={{ fontWeight: "bold", color: "rgba(0, 0, 0, 0.4)" }}
+              sx={{
+                fontWeight: "900",
+                color: "rgba(0, 0, 0, 0.4)",
+                textAlign: "start",
+              }}
             >
               {new Date(day.valid_date).toLocaleDateString("es-ES", {
                 weekday: "long",
               })}
             </Typography>
-            <img
-              src={`https://www.weatherbit.io/static/img/icons/${day.weather.icon}.png`}
-              alt={translateWeather(day.weather.description)}
-              style={{ width: "20px", height: "20px" }}
-            />
+
             <Typography
               variant="caption"
               sx={{
@@ -77,6 +80,11 @@ const WeeklyForecast: React.FC<WeeklyForecastProps> = () => {
                 fontWeight: "700",
               }}
             >
+              <img
+                src={`https://www.weatherbit.io/static/img/icons/${day.weather.icon}.png`}
+                alt={translateWeather(day.weather.description)}
+                style={{ width: "30px", height: "30px" }}
+              />
               {translateWeather(day.weather.description)}
             </Typography>
             <Typography

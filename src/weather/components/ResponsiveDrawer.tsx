@@ -20,6 +20,7 @@ import ThermostatIcon from "@mui/icons-material/Thermostat";
 import AirIcon from "@mui/icons-material/Air";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
+import MyLocationIcon from "@mui/icons-material/MyLocation";
 import useGeolocationAndCity from "../hooks/useGeolocation";
 import { RootState } from "../../store";
 import { setLoading, setNewCity } from "../../store/weather/weatherSlice";
@@ -45,19 +46,21 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
 
   // Efecto para disparar la búsqueda inicial o cuando cambia la ciudad
   useEffect(() => {
-    const checkCity = setTimeout(() => {
+    const defaultCity = "Buenos Aires"; // Ciudad por defecto
+    if (!city) {
+      dispatch(setNewCity(defaultCity));
+    } else {
       fetchData(city);
-    }, 1000);
+    }
+  }, [city, dispatch]);
 
-    clearTimeout(checkCity);
-  }, [city]);
-
+  // Función para manejar la búsqueda y carga de datos
   const fetchData = async (city: string) => {
     try {
       dispatch(setLoading(true));
       await fetchWeatherMapData(city, dispatch);
 
-      const { lat, lon } = coordinates || {};
+      const { lat, lon } = weatherData.coord; // Accedemos a las coordenadas desde weatherData
 
       if (lat !== undefined && lon !== undefined) {
         await fetchWeatherBitData({ lat, lon }, dispatch);
@@ -92,44 +95,52 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
         ...sx,
       }}
     >
-      <Grid container sx={{ width: "96%", borderRadius: 2 }}>
+      <Grid container sx={{ width: "99%", borderRadius: 2 }}>
         <form onSubmit={onSubmit} className="searchForm">
           <Grid
             sx={{
               width: "100%",
               height: "42px",
               display: "flex",
+              marginLeft: "2%",
               justifyContent: "space-around",
               backgroundColor: "rgba(0, 0, 0, 0.1)",
               borderRadius: 2,
             }}
           >
             <Input
-              sx={{ width: "90%", marginLeft: "6px" }}
+              sx={{
+                width: "97%",
+                marginLeft: "6px",
+                border: "none",
+                outline: "none",
+                borderBottom: "none",
+              }}
               type="text"
               placeholder="Search for cities"
               onChange={(e) => {
                 dispatch(setNewCity(e.target.value));
-
-                //setInputCity(e.target.value);
               }}
             />
-            <button type="submit">
+            <button
+              type="submit"
+              style={{ border: "none", backgroundColor: "rgba(0, 0, 0, 0.01)" }}
+            >
               <SearchIcon />
             </button>
           </Grid>
         </form>
-        {/* Botón para actualizar la ubicación */}
         <Button
           onClick={handleRefreshLocation}
           variant="contained"
           sx={{
-            width: "80%",
-            backgroundColor: "rgba(0, 0, 0, 0.3)",
-            marginLeft: "60%",
+            width: "40px",
+            backgroundColor: "rgba(29, 159, 253, 0.5)",
+            marginLeft: "90%",
+            marginTop: "1%",
           }}
         >
-          Refresh Location
+          <MyLocationIcon />
         </Button>
       </Grid>
 
@@ -145,43 +156,64 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
           <CircularProgress />
         </Box>
       )}
-      {!loading && (
+      {!loading && weatherData && (
         <>
-          <Typography sx={{ marginLeft: "5%", marginTop: "4%" }} variant="h4">
+          <Typography sx={{ marginLeft: "8%", marginTop: "4%" }} variant="h4">
             <strong>
-              {weatherData?.name} | {weatherData?.sys.country}
+              {weatherData?.name} | {weatherData?.sys?.country}
             </strong>
           </Typography>
           <div>
-            <Typography sx={{ marginLeft: "5%", fontSize: "14px" }} paragraph>
+            <Typography sx={{ marginLeft: "8%", fontSize: "14px" }} paragraph>
               Chance of Rain: {weatherBitData?.chanceOfRain > 0 ? "100%" : "0%"}
             </Typography>
             <br />
             <br />
             <br />
           </div>
-          <Typography sx={{ marginLeft: "5%" }} variant="h3">
+          <Typography
+            sx={{
+              marginLeft: "8%",
+              marginTop: "-2%",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+            variant="h2"
+          >
             <strong>
-              {parseFloat(weatherData?.main.temp - 273.15).toFixed(0)}&deg;C
+              {parseFloat(weatherData?.main?.temp - 273.15).toFixed(0)}&deg;C
             </strong>
+            <img
+              src={`http://openweathermap.org/img/wn/${weatherData?.weather[0].icon}@2x.png`}
+              alt={weatherData?.weather[0].main}
+              style={{
+                width: "280px",
+                height: "280px",
+                position: "absolute",
+                top: "20%",
+                left: "40%",
+              }}
+            />
           </Typography>
 
           <Grid
             container
             sx={{
               backgroundColor: "rgba(0, 0, 0, 0.1)",
-              marginTop: 10,
-              marginLef: 1,
+              marginTop: 5,
+              marginLef: "3%",
               marginBottom: 2,
               borderRadius: 3,
-              width: "94%",
+              position: "relative",
+              left: "2%",
+              width: "97%",
             }}
           >
             <Typography
               paragraph
               noWrap
               sx={{
-                paddingTop: "7%",
+                paddingTop: "5%",
                 paddingLeft: "5%",
                 fontSize: "16px",
                 color: "rgba(0, 0, 0, 0.5)",
@@ -191,7 +223,7 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
             >
               TODAY´S FORECAST
             </Typography>
-            <Grid container spacing={2} sx={{ padding: 2, paddingBottom: 8 }}>
+            <Grid container spacing={2} sx={{ paddingBottom: "3%" }}>
               {hourlyForecast &&
                 hourlyForecast.list
                   .slice(0, 6)
@@ -204,7 +236,8 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
-                        justifyContent: "center",
+                        marginRight: "-0.5%",
+                        justifyContent: "space-around",
                       }}
                     >
                       <Typography
@@ -212,7 +245,7 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
                         sx={{
                           textAlign: "center",
                           padding: 1,
-                          fontSize: "14px",
+                          fontSize: "16px",
                           color: "rgba(0, 0, 0, 0.4)",
                           fontWeight: "700",
                         }}
@@ -225,14 +258,14 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
                       <img
                         src={`http://openweathermap.org/img/wn/${forecast.weather[0].icon}.png`}
                         alt={forecast.weather[0].main}
-                        style={{ maxWidth: "100%", height: "auto" }}
+                        style={{ width: "65px", height: "65px" }}
                       />
                       <Typography
                         variant="caption"
                         sx={{
                           textAlign: "center",
                           color: "rgba(0, 0, 0, 1)",
-                          fontSize: "20px",
+                          fontSize: "25px",
                           fontWeight: "700",
                         }}
                       >
@@ -249,15 +282,16 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
               padding: 3,
               backgroundColor: "rgba(0, 0, 0, 0.1)",
               borderRadius: 3,
-              width: "94%",
-              marginLeft: "1%",
+              width: "97%",
+              paddingLeft: "5%",
+              marginLeft: "2%",
             }}
           >
             <Typography
               sx={{
-                fontWeight: "700",
+                fontWeight: "900",
                 color: "rgba(0, 0, 0, 0.5)",
-                letterSpacing: "5px",
+                letterSpacing: "1px",
               }}
               paragraph
               noWrap
@@ -286,9 +320,9 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
                 </Typography>
                 <Typography
                   sx={{
-                    fontSize: "22px",
+                    fontSize: "30px",
                     fontWeight: "700",
-                    paddingLeft: "15%",
+                    paddingLeft: "7%",
                   }}
                   paragraph
                 >
@@ -317,9 +351,9 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
                 </Typography>
                 <Typography
                   sx={{
-                    fontSize: "22px",
+                    fontSize: "30px",
                     fontWeight: "700",
-                    paddingLeft: "15%",
+                    paddingLeft: "7%",
                   }}
                   paragraph
                 >
@@ -348,13 +382,12 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
                 >
                   <WaterDropIcon sx={{ mr: 1 }} />
                   Chance of Rain:
-                  {/* {weatherBitData?.chanceOfRain ?? 0 > 0 ? "100%" : "0%"} */}
                 </Typography>
                 <Typography
                   sx={{
-                    fontSize: "22px",
+                    fontSize: "30px",
                     fontWeight: "700",
-                    paddingLeft: "15%",
+                    paddingLeft: "7%",
                   }}
                   paragraph
                 >
@@ -383,9 +416,9 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
                 </Typography>
                 <Typography
                   sx={{
-                    fontSize: "22px",
+                    fontSize: "30px",
                     fontWeight: "700",
-                    paddingLeft: "15%",
+                    paddingLeft: "7%",
                   }}
                   paragraph
                 >
