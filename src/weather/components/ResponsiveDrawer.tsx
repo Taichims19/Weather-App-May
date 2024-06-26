@@ -81,7 +81,14 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
   };
 
   const handleRefreshLocation = async () => {
-    await refreshLocation();
+    try {
+      const newCity = await refreshLocation();
+      if (newCity) {
+        dispatch(setNewCity(newCity));
+      }
+    } catch (error) {
+      console.error("Error refreshing location:", error);
+    }
   };
 
   return (
@@ -292,6 +299,7 @@ const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({ sx }) => {
               backgroundColor: "rgba(0, 0, 0, 0.1)",
               borderRadius: 3,
               width: "97%",
+              height: "33%",
               paddingLeft: "5%",
               marginLeft: "2%",
             }}

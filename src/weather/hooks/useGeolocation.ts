@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-// import { useDispatch } from "react-redux";
 
 interface Location {
   loaded: boolean;
@@ -16,20 +15,20 @@ const useGeolocationAndCity = () => {
     city: null,
     error: null,
   });
-  // Agregamos un estado para controlar las actualizaciones
   const [updateCount, setUpdateCount] = useState(0);
 
-  // const dispatch = useDispatch(); // Inicializa useDispatch
-
-  const getCityFromCoordinates = async (lat: any, lon: any) => {
+  const getCityFromCoordinates = async (lat: number, lon: number) => {
     try {
       const response = await axios.get(
         `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lon}&key=86799fe9255e40e3b0bf260daa082854`
       );
-      const address =
-        response.data.results[0].components.city ||
-        response.data.results[0].components.town;
-      return address;
+      const result = response.data.results[0];
+      const city =
+        result.components.city ||
+        result.components.town ||
+        result.components.village ||
+        result.components.state_district;
+      return city;
     } catch (error) {
       console.error("Error fetching city from coordinates:", error);
       return "";
@@ -39,7 +38,6 @@ const useGeolocationAndCity = () => {
   const onSuccess = async (position: {
     coords: { latitude: number; longitude: number };
   }) => {
-    console.log("Posición obtenida:", position);
     const { latitude, longitude } = position.coords;
     const city = await getCityFromCoordinates(latitude, longitude);
     setLocation({
@@ -60,21 +58,17 @@ const useGeolocationAndCity = () => {
 
   useEffect(() => {
     if (!("geolocation" in navigator)) {
-      onError({
-        code: 0,
-        message: "Geolocation not supported",
-      });
+      onError({ message: "Geolocation not supported" });
       return;
     }
 
     navigator.geolocation.getCurrentPosition(onSuccess, onError, {
-      maximumAge: 0, // No aceptar caché
-      timeout: 10000, // Tiempo de espera después de 10 segundos
-      enableHighAccuracy: true, // Solicitar la mejor precisión posible
+      maximumAge: 0,
+      timeout: 10000,
+      enableHighAccuracy: true,
     });
-  }, [updateCount]); // Se ejecutará de nuevo cuando 'updateCount' cambie
+  }, [updateCount]);
 
-  // Función para actualizar la ubicación
   const refreshLocation = (): Promise<string | null> => {
     return new Promise((resolve, reject) => {
       setUpdateCount((prevCount) => prevCount + 1);
@@ -115,7 +109,8 @@ const useGeolocationAndCity = () => {
       );
     });
   };
-  return { ...location, refreshLocation }; // Extendemos el objeto de retorno para incluir 'refreshLocation'
+
+  return { ...location, refreshLocation };
 };
 
 export default useGeolocationAndCity;

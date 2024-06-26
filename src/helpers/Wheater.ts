@@ -345,13 +345,13 @@ export const defaultWeatherData = {
   sys: {
     type: 2,
     id: 2075535,
-    country: "GB",
+    country: "AR",
     sunrise: 1717818277,
     sunset: 1717877693,
   },
   timezone: 3600,
   id: 2643743,
-  name: "London",
+  name: "Buenos Aires",
   cod: 200,
 };
 
